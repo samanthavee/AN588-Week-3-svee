@@ -2,29 +2,102 @@
 title: "reesehs_PeerCommentary_svee_02"
 author: "Reese Hotten-Somers"
 date: "2023-10-02"
-output: html_document
+output:
+    prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+    toc: yes
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+<center>
+![Chunky guy](https://assets.isu.pub/document-structure/230706143934-6b4b2e34ca282ca67a8b26f4876f1f60/v1/ded975c198157a739b4ac00ce82f800b.jpeg)
+</center>
+reesehs: I didn't know that you could embed a picture link, that's so cool! Also, that is a very chunky titi monkey, so cute :)
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+# Preliminaries
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+Set working directory and load relevant libraries:
+```{r libraries, eval= FALSE}
+library(prettydoc)
+library(yaml)
+library(tidyverse)
 ```
 
-## Including Plots
+# Homework Questions
+Every Saturday morning, at the same time, a primatologist goes and sits in the forest to listen for titi monkey calls, counting the number of calls they hear in a 2 hour window from 5am to 7am. Based on previous knowledge, she believes that the mean number of calls she will hear in that time is exactly 15. Let X represent the appropriate Poisson random variable of the number of calls heard in each monitoring session. <br><br>
+lambda = 15 [this is the probability mass function for the poisson distribution, aka mean number of occurrences of event in given interval] <br>
+X = number of calls heard in a 2 hr window
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+## What is the probability that she will hear more than 8 calls during any given session?
+I looked at the R documentation for the ppois() function to help me start this
+```{r q1}
+ppois(q = 8, lambda = 15, lower.tail = F)
+# lower.tail is set to FALSE because we want more than 8 calls (so 9 or higher)
+#reesehs: this looks great! I didn't realize for logical indicators you could just use F or T! I'm learning so much already! I have also realized that I did my code wrong because I set my q to 7 instead of 8 but the question is not asking for 8 or more its really more than 8, silly me. 
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## What is the probability that she will hear no calls in a session?
+I'm using the same ppois() function as the previous function
+```{r q2}
+ppois(q = 0, lambda = 15) 
+# hearing up to and including 0 calls so i didn't set lower.tail to F like i did previously
+
+#reesehs: I like how you are naming your chunks based on question! No sure if it makes a difference but you could also use dpois in this instance because we are only taking the probability at one point, and not cumulative probability like ppois is used for. However I used dpois and I got the same number as you so I don't think it particularly matter. IDK just a math thought I guess :)
+```
+
+## What is the probability that she will hear exactly 3 calls in a session?
+I'm not using the ppois() function again because the question is asking about hearing *exactly* 3 calls <br>
+Instead, I'm using the dpois() function to find the probability of a certain number of successes occurring 
+```{r q3}
+dpois(x = 3, lambda = 15)
+
+#reesehs: ok well, now my previous comment is a little needed since you explain in the header but 0 is still one number but its kind of semantics in the above question. This looks great, if you really wanted to you could get rid of lambda and x variables and just have it be dpois(3, 15) for simplicity sake. But again, totally unneeded and it might make it more confusing when you go back and try and figure out what your code is doing
+```
+## Plot the relevant Poisson mass function over the values in range 0 ≤ x ≤ 30.
+```{r q4}
+# assigning all values in range 0 ≤ x ≤ 30 to variable x
+x <- 1:30 
+
+# creating variable where i calculate dpois using previous info
+massfunctionplot <- dpois(x = x, lambda = 15)
+
+# making mass function plot, removing space between individual bars, making title and labeling axes
+barplot(massfunctionplot, names.arg = x, space = 0, xlab = "x", ylab = "Pr(X = x)", 
+        main = "Poisson Probability Mass Function")
+
+#reesehs: this looks great! I was pretty straightforward from the info given in the module so no feedback from me :)
+#side note: I really like how your chunks are layed out. Especially that you put your comments before the function because when you knit the file you are always able to see the explaination before the code is run. 
+```
+
+## Simulate 104 results from this distribution (i.e., 2 years of Saturday monitoring sessions).
+The function rpois() will generate or 'simulate' a list of random variables that follow a poisson distribution with a certain rate of success.
+```{r q5}
+# n = 104 because that's how many results we want to simulate, lambda = 15 as usual
+simulate <- rpois(n = 104, lambda = 15)
+
+#reesehs: Looks great! Only thing that I would suggest is that you return simulate so that in your knit document you can see the numbers it randomly produces. 
+```
+
+## Plot the simulated results using hist() and use xlim() to set the horizontal limits to be from 0 to 30. How does your histogram compare to the shape of the probability mass function you plotted above?
+```{r q6}
+hist(simulate, xlim = range(0:30), breaks = c(1:30), 
+     main = "Simulated results from poisson distribution", 
+     xlab = "Number of calls heard", ylab = "Probability")
+#reesehs: this graph looks great! I especially liked how you used the range function for xlim. I hadn't seen that before but it makes it super simple!(I just created a vector from 0-30 but I like yours more) the one thing I would say is don't forget to put probability = TRUE in your histogram so that your y access will be in terms of probability :)
+```
+<br> This histogram has roughly the same shape as the probability mass function plotted previously. The probabilities of calls heard for the simulated data is less evenly distributed between 0-30.
+
+
+# Challenges Faced
+1. I was having trouble understanding the difference between the ppois() and dpois() functions and when they should be used. [This link](https://www.statology.org/dpois-ppois-qpois-rpois-r/) helped me understand it better. <br>
+2. Question 5 initially threw me off because I read "simulate" and got scared. The R documentation wasn't very helpful so I referred back to the same link mentioned above. I realized that the rpois() function could help me and that I didn't have to do anything too intense. <br>
+3. I'm more familiar plotting with {ggplot2} than the base R package. I had to check the R documentation to figure out how to set horizontal limits for the last question because the packages use different syntax.<br>
+4. The cayman theme didn't show up when I initially knit my document. I had to search how the prettydoc package worked and how to use the correct syntax <br>
+5. I keep receiving an error about YAML parsing when I tried to knit. I spent an embarrassing amount of time trying to figure out what was wrong with my code and finally made the error go away by removing "---" between sections. I originally included those to draw lines between sections.
+
+
+reesehs: Sam, you killed this! There's not much I can offer honestly. Just a few tweaks(maybe just two) and you should be golden! Let me know if you have any questions about my comments :))
