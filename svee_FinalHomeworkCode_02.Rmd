@@ -1,0 +1,104 @@
+---
+title: "Final AN588 Homework Code 02: Titis in the Mist..."
+author: "Samantha Vee"
+date: "2023-10-02"
+output:
+    prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<center>
+![Chunky guy](https://assets.isu.pub/document-structure/230706143934-6b4b2e34ca282ca67a8b26f4876f1f60/v1/ded975c198157a739b4ac00ce82f800b.jpeg)
+</center>
+
+# Preliminaries
+
+Set working directory and load relevant libraries:
+```{r libraries, eval= FALSE}
+library(prettydoc)
+library(yaml)
+library(tidyverse)
+```
+
+# Homework Questions
+Every Saturday morning, at the same time, a primatologist goes and sits in the forest to listen for titi monkey calls, counting the number of calls they hear in a 2 hour window from 5am to 7am. Based on previous knowledge, she believes that the mean number of calls she will hear in that time is exactly 15. Let X represent the appropriate Poisson random variable of the number of calls heard in each monitoring session. <br><br>
+lambda = 15 [this is the probability mass function for the poisson distribution, aka mean number of occurrences of event in given interval] <br>
+X = number of calls heard in a 2 hr window
+
+## 1. What is the probability that she will hear more than 8 calls during any given session?
+I looked at the R documentation for the ppois() function to help me start this
+```{r q1}
+ppois(q = 8, lambda = 15, lower.tail = F)
+# lower.tail is set to FALSE because we want more than 8 calls (so 9 or higher)
+```
+
+## 2. What is the probability that she will hear no calls in a session?
+I'm using the same ppois() function as the previous function
+```{r q2a}
+ppois(q = 0, lambda = 15) 
+# hearing up to and including 0 calls so i didn't set lower.tail to F like i did previously
+```
+
+Reese suggested using dpois instead of ppois since we are only taking the probability at one point. 
+```{r q2b}
+dpois(x = 0, lambda = 15)
+# same result, like reese said! 
+```
+
+## 3. What is the probability that she will hear exactly 3 calls in a session?
+I'm not using the ppois() function again because the question is asking about hearing *exactly* 3 calls <br>
+Instead, I'm using the dpois() function to find the probability of a certain number of successes occurring 
+```{r q3}
+dpois(x = 3, lambda = 15)
+# reese mentioned that if i want to make this shorter, i can also use dpois(3, 15)
+```
+
+## 4. Plot the relevant Poisson mass function over the values in range 0 ≤ x ≤ 30.
+```{r q4}
+# assigning all values in range 0 ≤ x ≤ 30 to variable x
+x <- 1:30 
+
+# creating variable where i calculate dpois using previous info
+massfunctionplot <- dpois(x = x, lambda = 15)
+
+# making mass function plot, removing space between individual bars, making title and labeling axes
+barplot(massfunctionplot, names.arg = x, space = 0, xlab = "x", ylab = "Pr(X = x)", 
+        main = "Poisson Probability Mass Function")
+```
+
+## 5. Simulate 104 results from this distribution (i.e., 2 years of Saturday monitoring sessions).
+The function rpois() will generate or 'simulate' a list of random variables that follow a poisson distribution with a certain rate of success.
+```{r q5}
+# n = 104 because that's how many results we want to simulate, lambda = 15 as usual
+simulate <- rpois(n = 104, lambda = 15)
+simulate
+```
+
+## 6. Plot the simulated results using hist() and use xlim() to set the horizontal limits to be from 0 to 30. How does your histogram compare to the shape of the probability mass function you plotted above?
+```{r q6}
+hist(simulate, xlim = range(0:30), breaks = c(1:30), probability = TRUE, 
+     main = "Simulated results from poisson distribution", 
+     xlab = "Number of calls heard", ylab = "Probability")
+```
+<br> This histogram has roughly the same shape as the probability mass function plotted previously. The probabilities of calls heard for the simulated data is less evenly distributed between 0-30.
+
+
+# Challenges Faced
+1. I was having trouble understanding the difference between the ppois() and dpois() functions and when they should be used. [This link](https://www.statology.org/dpois-ppois-qpois-rpois-r/) helped me understand it better. <br>
+2. Question 5 initially threw me off because I read "simulate" and got scared. The R documentation wasn't very helpful so I referred back to the same link mentioned above. I realized that the rpois() function could help me and that I didn't have to do anything too intense. <br>
+3. I'm more familiar plotting with {ggplot2} than the base R package. I had to check the R documentation to figure out how to set horizontal limits for the last question because the packages use different syntax.<br>
+4. The cayman theme didn't show up when I initially knit my document. I had to search how the prettydoc package worked and how to use the correct syntax <br>
+5. I keep receiving an error about YAML parsing when I tried to knit. I spent an embarrassing amount of time trying to figure out what was wrong with my code and finally made the error go away by removing "---" between sections. I originally included those to draw lines between sections.
+
+# Changes made to final code
+1. I used Reese's comments to replicate question 2 with dpois instead of ppois! I referenced my notes to understand why we get the same result with different functions.
+2. I added a comment in chunk 'q3' noting a shorter way to write out the function. I kept the longer form so I know what each number is referring to.
+3. For question 5, I returned the 'simulate' variable so I can actually see the output of simulated results (thanks Reese!)
+4. I added 'probability = TRUE' to my histogram in question 6. It originally showed frequency but now it shows the probability of each point in each interval.
+5. I'm not sure if I'm supposed to keep peer comments in the final code but for the sake of making the final knitted doc look clean, I deleted Reese's comments :(
