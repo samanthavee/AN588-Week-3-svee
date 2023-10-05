@@ -3,15 +3,11 @@ title: "Final AN588 Homework Code 02: Titis in the Mist..."
 author: "Samantha Vee"
 date: "2023-10-02"
 output:
-    prettydoc::html_pretty:
+  prettydoc::html_pretty:
     theme: cayman
     highlight: github
     toc: yes
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
 <center>
 ![Chunky guy](https://assets.isu.pub/document-structure/230706143934-6b4b2e34ca282ca67a8b26f4876f1f60/v1/ded975c198157a739b4ac00ce82f800b.jpeg)
